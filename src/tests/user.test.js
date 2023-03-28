@@ -2,7 +2,8 @@ const request = require('supertest');
 const app = require('../app');
 
 let userId; 
-let token
+let token;
+let user;
 
 test("POST /api/v1/users should create a user", async() => {
     const newUser = {
@@ -48,7 +49,16 @@ test("GET /api/v1/users should return all users", async() => {
         .get('/api/v1/users')
         .set('Authorization', `Bearer ${token}`);
     expect(res.status).toBe(200);
-    expect(res.body).toHaveLength(1);   
+    expect(res.body).toHaveLength(2);   
+});
+
+test("GET /api/v1/users/:id should return one user", async() => {
+    const res = await request(app)
+        .get(`/api/v1/users/${userId}`)
+        .set('Authorization', `Bearer ${token}`);
+    user = res.body;
+    expect(res.status).toBe(200);
+    expect(user).toBeDefined();   
 });
 
 test("PUT /api/v1/users/:id should update one user", async() => {
