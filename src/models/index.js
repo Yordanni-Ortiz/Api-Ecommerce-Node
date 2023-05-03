@@ -1,15 +1,16 @@
 const Cart = require("./Cart");
 const Category = require("./Category");
 const Product = require("./Product");
-const ProductImg = require("./ProductImg");
+/*const ProductImg = require("./ProductImg");*/
 const Purchase = require("./Purchase");
 const User = require("./User");
+const CloudinaryImg = require("./CloudinaryImg")
 
 Product.belongsTo(Category);
 Category.hasMany(Product);
 
-ProductImg.belongsTo(Product);
-Product.hasMany(ProductImg);
+CloudinaryImg.belongsTo(Product);
+Product.hasMany(CloudinaryImg);
 
 Cart.belongsTo(User);
 User.hasMany(Cart);
