@@ -1,11 +1,11 @@
 const catchError = require('../utils/catchError');
 const Product = require('../models/Product');
-/*const ProductImg = require('../models/ProductImg');*/
+const ProductImg = require('../models/ProductImg');
 const CloudinaryImg = require('../models/CloudinaryImg');
 const Category = require('../models/Category');
 
 const getAll = catchError(async(req, res) => {
-    const results = await Product.findAll({ include: [ CloudinaryImg, Category ] });
+    const results = await Product.findAll({ include: [ ProductImg, CloudinaryImg, Category ] });
     return res.json(results);
 });
 
@@ -16,7 +16,7 @@ const create = catchError(async(req, res) => {
 
 const getOne = catchError(async(req, res) => {
     const { id } = req.params;
-    const result = await Product.findByPk(id, { include: [ CloudinaryImg, Category ] });
+    const result = await Product.findByPk(id, { include: [ ProductImg, CloudinaryImg, Category ] });
     if(!result) return res.sendStatus(404);
     return res.json(result);
 });
