@@ -6,7 +6,7 @@ const ProductImg = sequelize.define('productImg', {
         type: DataTypes.TEXT,
         allowNull: false
     },
-    filename: {
+    publicId: {
         type: DataTypes.STRING,
         allowNull: false
     },

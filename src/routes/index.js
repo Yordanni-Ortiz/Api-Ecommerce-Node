@@ -5,7 +5,6 @@ const productRouter = require('./product.router');
 const productImgRouter = require('./productImg.router');
 const purchaseRouter = require('./purchase.router');
 const userRouter = require('./user.router');
-const cloudinaryImagesRouter = require('./cloudinaryImg.router');
 const router = express.Router();
 
 // colocar las rutas aquí
@@ -15,6 +14,5 @@ router.use('/products', productRouter);
 router.use('/product_images', productImgRouter);
 router.use('/cart', cartRouter);
 router.use('/purchases', purchaseRouter);
-router.use('/cloudinary_images', cloudinaryImagesRouter);
 
 module.exports = router;
