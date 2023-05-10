@@ -3,7 +3,7 @@ const sequelize = require('../utils/connection');
 
 const ProductImg = sequelize.define('productImg', {
     url: {
-        type: DataTypes.TEXT,
+        type: DataTypes.STRING,
         allowNull: false
     },
     publicId: {
