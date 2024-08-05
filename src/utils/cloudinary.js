@@ -8,6 +8,7 @@ cloudinary.config({
     api_secret: process.env.CLOUDINARY_API_SECRET
 });
 
+// Función para subir imágenes de los productos
 const uploadToCloudinary = async(localFilePath, filename) => {
     try {
         var folder = "images_ecommerce";
@@ -25,6 +26,7 @@ const uploadToCloudinary = async(localFilePath, filename) => {
     }
 }
 
+// Función para eliminar imágenes de los productos
 const deleteFromCloudinary = async(publicId) => {
     try {
         await cloudinary.uploader.destroy(publicId);
@@ -34,4 +36,31 @@ const deleteFromCloudinary = async(publicId) => {
     }
 }
 
-module.exports = { uploadToCloudinary, deleteFromCloudinary };
+// Función para subir imágenes de perfil
+const uploadToCloudinaryImagesProfile = async(localFilePath, filename) => {
+    if (!localFilePath || !filename) {
+        console.error('Missing file path or filename.');
+        return { message: "Missing file path or filename" };
+    }
+
+    try {
+        const folder = "images_profiles";
+        const filePathOnCloudinary = folder + "/" + path.parse(filename).name;
+
+        const result = await cloudinary.uploader.upload(localFilePath, {
+            public_id: filePathOnCloudinary,
+            folder: folder
+        });
+
+        return result;
+    } catch (error) {
+        console.error('Error uploading to Cloudinary:', error);
+        return { message: "Upload to cloudinary failed" };
+    } finally {
+        if (fs.existsSync(localFilePath)) {
+            fs.unlinkSync(localFilePath);
+        }
+    }
+};
+
+module.exports = { uploadToCloudinary, deleteFromCloudinary, uploadToCloudinaryImagesProfile };

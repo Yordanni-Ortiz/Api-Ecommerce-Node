@@ -3,6 +3,10 @@ const sequelize = require('../utils/connection');
 const bcrypt = require('bcrypt');
 
 const User = sequelize.define('user', {
+    userName: {
+        type: DataTypes.STRING,
+        allowNull: false
+    },
     firstName: {
         type: DataTypes.STRING,
         allowNull: false
@@ -24,6 +28,16 @@ const User = sequelize.define('user', {
         type: DataTypes.STRING,
         allowNull: false
     },
+    profileImageUrl: {
+        type: DataTypes.STRING,
+        defaultValue: process.env.DEFAULT_IMAGE_URL
+    },    
+    resetPasswordToken: {
+        type: DataTypes.STRING,
+    },
+    resetPasswordExpires: {
+        type: DataTypes.DATE,
+    }
 });
 
 User.beforeCreate(async(user) => {
