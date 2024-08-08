@@ -6,7 +6,8 @@ const PORT = process.env.PORT || 8080;
 
 const main = async () => {
     try {
-        sequelize.sync();
+        console.log("Applying migrations...");
+        await sequelize.authenticate();
         console.log("DB connected");
         app.listen(PORT);
         console.log(`Server running on port ${PORT}`);
