@@ -113,68 +113,34 @@ const changePassword = catchError(async (req, res) => {
     }
 });
 
-const uploadProfileImage = (req, res) => {
-    const form = new formidable.IncomingForm({
-        uploadDir: path.join(__dirname, '../../uploads'), // Ruta donde se guardarán los archivos temporales
-        keepExtensions: true, // Mantener las extensiones del archivo
-        multiples: false // Si esperas un solo archivo
-    });
+const uploadProfileImage = async (req, res) => {
+    try {
+        const form = new formidable.IncomingForm({ uploadDir: path.join(__dirname, '../../uploads'), keepExtensions: true });
+        form.parse(req, async (err, fields, files) => {
+            if (err || !files.profileImage) return res.status(400).json({ message: 'Error uploading file' });
 
-    form.parse(req, async (err, fields, files) => {
-        if (err) {
-            console.error('Error parsing the file:', err);
-            return res.status(500).json({ message: 'Error parsing the file' });
-        }
-
-        // Obtener el archivo subido
-        const fileArray = files.profileImage; // Aquí es un array
-        if (!fileArray || fileArray.length === 0) {
-            console.error('No file or file path provided');
-            return res.status(400).json({ message: 'No file uploaded' });
-        }
-
-        // Asumimos que el primer archivo en el array es el que necesitamos
-        const file = fileArray[0];
-        if (!file.filepath) {
-            console.error('No file path provided');
-            return res.status(400).json({ message: 'No file path' });
-        }
-
-        try {
-            // Subir a Cloudinary
+            const file = files.profileImage[0];
             const cloudinaryResult = await uploadToCloudinaryImagesProfile(file.filepath, file.originalFilename);
+            fs.existsSync(file.filepath) && fs.unlinkSync(file.filepath);
 
-            // Eliminar archivo local después de subirlo a Cloudinary
-            if (fs.existsSync(file.filepath)) {
-                fs.unlinkSync(file.filepath);
-            }
-
-            // Obtener el ID del usuario del token JWT (esto asume que estás utilizando autenticación JWT)
-            const authHeader = req.headers.authorization;
-            if (!authHeader) return res.status(401).json({ message: "Authorization header missing" });
-
-            const token = authHeader.split(" ")[1];
-            if (!token) return res.status(401).json({ message: "Token missing" });
+            const token = req.headers.authorization?.split(" ")[1];
+            if (!token) return res.status(401).json({ message: "Unauthorized" });
 
             const decoded = jwt.verify(token, process.env.TOKEN_SECRET);
-            const userId = decoded.user.id;
-
-            // Actualizar el usuario en la base de datos con la nueva URL de la imagen de perfil
-            const user = await User.findByPk(userId);
+            const user = await User.findByPk(decoded.user.id);
             if (!user) return res.status(404).json({ message: "User not found" });
 
+            // Actualiza el campo profileImageUrls
+            const updatedImageUrls = [...user.profileImageUrls, cloudinaryResult.secure_url];
+            user.profileImageUrls = updatedImageUrls;
             user.profileImageUrl = cloudinaryResult.secure_url;
             await user.save();
 
-            // Devolver la URL de la imagen cargada
-            res.status(200).json({
-                profileImageUrl: cloudinaryResult.secure_url
-            });
-        } catch (error) {
-            console.error('Error uploading to Cloudinary:', error);
-            res.status(500).json({ message: 'Error uploading to Cloudinary' });
-        }
-    });
+            res.status(200).json({ profileImageUrl: cloudinaryResult.secure_url, profileImageUrls: user.profileImageUrls });
+        });
+    } catch (error) {
+        res.status(500).json({ message: 'Error uploading profile image' });
+    }
 };
 
 module.exports = {
