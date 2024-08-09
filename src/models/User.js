@@ -31,7 +31,11 @@ const User = sequelize.define('user', {
     profileImageUrl: {
         type: DataTypes.STRING,
         defaultValue: process.env.DEFAULT_IMAGE_URL
-    },    
+    },   
+    profileImageUrls: {
+        type: DataTypes.JSONB,
+        defaultValue: []
+    }, 
     resetPasswordToken: {
         type: DataTypes.STRING,
     },
